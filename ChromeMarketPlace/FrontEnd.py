@@ -113,3 +113,11 @@ with tab3:
             st.success("Website submitted successfully!")
         else:
             st.error("Please enter a website URL.")
+
+    # Display submitted websites
+    st.subheader("Submitted Websites")
+    if st.session_state.websites:
+        for website in st.session_state.websites:
+            st.write(website)
+    else:
+        st.write("No websites submitted yet.")

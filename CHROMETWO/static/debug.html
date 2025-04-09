@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chrome Hearts Database - Debug</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            padding: 2rem;
+        }
+        .debug-section {
+            background-color: #f5f5f5;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+        .debug-actions {
+            margin-top: 1rem;
+            display: flex;
+            gap: 1rem;
+        }
+        pre {
+            background-color: #eee;
+            padding: 1rem;
+            border-radius: 4px;
+            overflow: auto;
+            max-height: 400px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Debug Page</h1>
+    <p><a href="index.html">← Back to main page</a></p>
+    
+    <div class="debug-section">
+        <h2>API Status</h2>
+        <div id="api-status">Loading...</div>
+        <div class="debug-actions">
+            <button id="check-api">Check API Status</button>
+        </div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>Seed Data</h2>
+        <p>Add sample data to the database for testing.</p>
+        <div class="debug-actions">
+            <button id="seed-data">Seed Sample Data</button>
+        </div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>API Response</h2>
+        <pre id="api-response">No data yet</pre>
+    </div>
+    
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        
+        document.getElementById('check-api').addEventListener('click', async () => {
+            try {
+                const response = await fetch(`${API_URL}/debug`);
+                const data = await response.json();
+                
+                document.getElementById('api-status').innerHTML = `
+                    <p>Status: <strong>${data.status}</strong></p>
+                    <p>Database exists: <strong>${data.database_exists}</strong></p>
+                    <p>Item count: <strong>${data.item_count}</strong></p>
+                    <p>API version: <strong>${data.api_version}</strong></p>
+                `;
+                
+                document.getElementById('api-response').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('api-status').innerHTML = `
+                    <p style="color: red">Error: ${error.message}</p>
+                    <p>Make sure the Flask API is running on port 5000</p>
+                `;
+            }
+        });
+        
+        document.getElementById('seed-data').addEventListener('click', async () => {
+            try {
+                const response = await fetch(`${API_URL}/seed`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                
+                document.getElementById('api-response').textContent = JSON.stringify(data, null, 2);
+                
+                if (data.status === 'success') {
+                    alert('Sample data added successfully!');
+                } else {
+                    alert(`Error: ${data.message}`);
+                }
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            }
+        });
+        
+        // Check API status on page load
+        document.getElementById('check-api').click();
+    </script>
+</body>
+</html>
