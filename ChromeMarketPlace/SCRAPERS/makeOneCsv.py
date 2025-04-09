@@ -6,6 +6,7 @@
 import os
 import pandas as pd
 import concurrent.futures
+import sqlite3
 
 from SCRAPERS.yp import scrapeYP
 from SCRAPERS.scrapeSuns import scrapeSuns
@@ -22,6 +23,11 @@ def removeCH(df):
 def cleanData(df):
     # any extra cleaning that needs to be done
     pass
+
+def save_to_db(df, db_path="chrome_hearts.db"):
+    conn = sqlite3.connect(db_path)
+    df.to_sql("items", conn, if_exists="replace", index=False)
+    conn.close()
 
 @run_weekly("combined_data.csv")
 def makeOneDF():
@@ -44,6 +50,9 @@ def makeOneDF():
     fullDF = pd.concat([yp, TD, sun, jr], ignore_index=True)
     fullDF = removeCH(fullDF)
     cleanData(fullDF)
+
+    # Save to database
+    save_to_db(fullDF)
 
     return fullDF
 

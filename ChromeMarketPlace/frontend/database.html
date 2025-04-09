@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database - Chrome Hearts Marketplace</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        async function fetchData() {
+            try {
+                const response = await fetch('/api/database');
+                const data = await response.json();
+                const table = document.getElementById('data-table');
+                data.forEach(item => {
+                    const row = table.insertRow();
+                    Object.values(item).forEach(value => {
+                        const cell = row.insertCell();
+                        cell.textContent = value;
+                    });
+                });
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+        window.onload = fetchData;
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Database</h1>
+    </header>
+    <main>
+        <table id="data-table" border="1">
+            <thead>
+                <tr>
+                    <th>Item Name</th>
+                    <th>Price</th>
+                    <th>Link</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be populated here -->
+            </tbody>
+        </table>
+        <a href="/index.html" class="link">Back to Home</a>
+    </main>
+</body>
+</html>

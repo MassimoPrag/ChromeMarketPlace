@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chrome Hearts Database</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Add cross-origin headers -->
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <meta http-equiv="Access-Control-Allow-Methods" content="GET, POST, OPTIONS">
+    <meta http-equiv="Access-Control-Allow-Headers" content="Content-Type">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>CHROME HEARTS DATABASE</h1>
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Search for items...">
+                <button id="search-button">Search</button>
+            </div>
+            <button id="refresh-button">Refresh Data</button>
+        </header>
+        
+        <!-- Add connection troubleshooting panel -->
+        <div id="connection-trouble" style="background-color: #f8d7da; color: #721c24; padding: 10px; margin: 10px 0; border-radius: 4px; display:none;">
+            <h3>Connection Issues Detected</h3>
+            <p>You seem to be having trouble connecting to the server. Try these alternatives:</p>
+            <ul>
+                <li><a href="http://127.0.0.1:5000/static/index.html" id="ip-link">Try using direct IP: 127.0.0.1</a></li>
+                <li><a href="#" id="test-api">Test API Connection</a></li>
+            </ul>
+            <div>
+                <h4>Common 403 Forbidden solutions:</h4>
+                <ol>
+                    <li>Try a different browser (Chrome, Firefox, Edge)</li>
+                    <li>Temporarily disable browser extensions</li>
+                    <li>Clear browser cache and cookies</li>
+                    <li>Try using incognito/private mode</li>
+                    <li>Check if your antivirus/firewall is blocking localhost</li>
+                </ol>
+            </div>
+        </div>
+        
+        <main>
+            <div id="loading" class="hidden">
+                <div class="loader"></div>
+                <p>Fetching data, please wait...</p>
+            </div>
+            
+            <div id="error-message" class="hidden"></div>
+            
+            <div id="items-container"></div>
+        </main>
+        
+        <footer>
+            <p>Chrome Hearts Database - All data is scraped from third-party resellers</p>
+            <p><small><a href="debug.html" style="color: #888;">Debug Page</a></small></p>
+            <!-- Add alternative links -->
+            <p><small>Alternative access: <a href="http://127.0.0.1:5000/static/index.html" style="color: #888;">via IP (127.0.0.1)</a></small></p>
+        </footer>
+    </div>
+    
+    <script src="app.js"></script>
+    
+    <!-- Add troubleshooting script -->
+    <script>
+        // Check if we've had connection issues
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Show troubleshooting panel if the app fails to load data
+                setTimeout(async function() {
+                    const items = document.querySelectorAll('#items-container .item-card');
+                    if (items.length === 0 && !document.getElementById('loading').classList.contains('hidden')) {
+                        document.getElementById('connection-trouble').style.display = 'block';
+                    }
+                }, 3000);
+                
+                // Test API connection button
+                document.getElementById('test-api').addEventListener('click', async function(e) {
+                    e.preventDefault();
+                    try {
+                        const ipResponse = await fetch('http://127.0.0.1:5000/api/debug');
+                        if (ipResponse.ok) {
+                            alert('Success! Connection to API via IP works. Try using the IP link instead of localhost.');
+                        } else {
+                            alert(`API responded with status: ${ipResponse.status}. There might be a server issue.`);
+                        }
+                    } catch (err) {
+                        alert(`Cannot connect to API: ${err.message}. Make sure the Flask server is running.`);
+                    }
+                });
+            } catch (err) {
+                console.error("Error in troubleshooting script:", err);
+            }
+        });
+        
+        // Detect 403 errors specifically
+        window.addEventListener('error', function(e) {
+            if (e.message && e.message.includes('403')) {
+                document.getElementById('connection-trouble').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
